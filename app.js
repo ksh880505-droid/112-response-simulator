@@ -5,7 +5,8 @@ const state = {
   scores: { safety: 0, tactical: 0, legal: 0 },
   history: [],
   result: null,
-  saved: false
+  saved: false,
+  user: null
 };
 const supabaseConfig = window.SUPABASE_CONFIG || {};
 const hasSupabaseConfig = Boolean(
@@ -33,6 +34,49 @@ function setSaveStatus(message, tone = "muted") {
   if (!target) return;
   target.textContent = message;
   target.dataset.tone = tone;
+}
+
+function setAuthMessage(message, tone = "muted") {
+  const target = $("auth-message");
+  if (!target) return;
+  target.textContent = message;
+  target.dataset.tone = tone;
+}
+
+function updateAuthUI() {
+  const signedIn = Boolean(state.user);
+  $("auth-status").innerHTML = signedIn ? "<span></span> 로그인됨" : "<span></span> 비회원 기록";
+  $("signout-button").classList.toggle("hidden", !signedIn);
+  $("auth-form").classList.toggle("hidden", signedIn);
+  if (signedIn) setAuthMessage(`${state.user.email} 계정으로 결과가 저장됩니다.`);
+  else if (!supabaseClient) setAuthMessage("Supabase 설정이 없어 비회원 로컬 진행만 가능합니다.", "warning");
+  else setAuthMessage("로그인하지 않아도 결과 저장은 가능하며, 로그인하면 계정과 함께 저장됩니다.");
+}
+
+async function loadSession() {
+  if (!supabaseClient) {
+    updateAuthUI();
+    return;
+  }
+
+  const { data } = await supabaseClient.auth.getSession();
+  state.user = data.session?.user || null;
+  updateAuthUI();
+
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    state.user = session?.user || null;
+    updateAuthUI();
+  });
+}
+
+async function signIn(email, password) {
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+}
+
+async function signUp(email, password) {
+  const { error } = await supabaseClient.auth.signUp({ email, password });
+  if (error) throw error;
 }
 
 function showView(id) {
@@ -130,6 +174,7 @@ async function saveResult() {
 
   setSaveStatus("훈련 결과를 저장하는 중입니다...");
   const { error } = await supabaseClient.from("training_results").insert({
+    user_id: state.user?.id ?? null,
     session_id: getSessionId(),
     scenario_id: scenario.id,
     scenario_title: scenario.title,
@@ -148,6 +193,39 @@ async function saveResult() {
   state.saved = true;
   setSaveStatus("훈련 결과가 DB에 자동 저장되었습니다.");
 }
+
+loadSession();
+
+$("auth-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!supabaseClient) {
+    setAuthMessage("Supabase 설정을 확인해야 합니다.", "warning");
+    return;
+  }
+  try {
+    await signIn($("auth-email").value, $("auth-password").value);
+    setAuthMessage("로그인되었습니다.");
+  } catch (error) {
+    setAuthMessage(`로그인 실패: ${error.message}`, "warning");
+  }
+});
+
+$("signup-button").addEventListener("click", async () => {
+  if (!supabaseClient) {
+    setAuthMessage("Supabase 설정을 확인해야 합니다.", "warning");
+    return;
+  }
+  try {
+    await signUp($("auth-email").value, $("auth-password").value);
+    setAuthMessage("회원가입 요청이 완료되었습니다. 이메일 확인 설정이 켜져 있으면 메일을 확인하십시오.");
+  } catch (error) {
+    setAuthMessage(`회원가입 실패: ${error.message}`, "warning");
+  }
+});
+
+$("signout-button").addEventListener("click", async () => {
+  if (supabaseClient) await supabaseClient.auth.signOut();
+});
 
 $("start-button").addEventListener("click", () => { resetState(); renderStep(); showView("simulation-view"); });
 $("exit-button").addEventListener("click", () => showView("intro-view"));
