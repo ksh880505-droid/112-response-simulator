@@ -7,6 +7,7 @@
   <meta name="description" content="현장 경찰관을 위한 흉기 위협 대응 의사결정 훈련 시뮬레이터">
   <title>112 RESPONSE | 흉기위협 대응 시뮬레이터</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="auth.css">
 </head>
 <body>
   <a class="skip-link" href="#main">본문으로 이동</a>
@@ -15,10 +16,29 @@
       <span class="brand-mark">112</span>
       <span><strong>RESPONSE</strong><small>현장 대응 훈련</small></span>
     </a>
-    <div class="status-pill"><span></span> 교육용 프로토타입</div>
+    <div class="topbar-actions">
+      <div id="auth-status" class="status-pill"><span></span> 비회원 기록</div>
+      <button id="signout-button" class="text-button hidden">로그아웃</button>
+    </div>
   </header>
 
   <main id="main">
+    <section id="auth-panel" class="auth-panel" aria-labelledby="auth-title">
+      <div>
+        <p class="eyebrow">SUPABASE AUTH</p>
+        <h2 id="auth-title">계정으로 훈련 기록을 남길 수 있습니다.</h2>
+      </div>
+      <form id="auth-form" class="auth-form">
+        <input id="auth-email" type="email" autocomplete="email" placeholder="email@example.com" required>
+        <input id="auth-password" type="password" autocomplete="current-password" placeholder="비밀번호" minlength="6" required>
+        <div class="auth-actions">
+          <button class="button primary" type="submit">로그인</button>
+          <button id="signup-button" class="button ghost" type="button">회원가입</button>
+        </div>
+      </form>
+      <p id="auth-message" class="auth-message"></p>
+    </section>
+
     <section id="intro-view" class="view active" aria-labelledby="hero-title">
       <div class="hero-grid">
         <div class="hero-copy">
@@ -26,7 +46,7 @@
           <h1 id="hero-title">당신은 지금 흉기를 든<br>대상자와 마주하고 있습니다.</h1>
           <p class="hero-lead">제한된 정보와 시간 안에서 다음 행동을 선택하십시오. 이 훈련은 정답 암기가 아니라 <strong>거리, 엄폐, 지원</strong>을 우선하는 판단 과정을 점검합니다.</p>
           <div class="hero-actions">
-            <button id="start-button" class="button primary">훈련 시작 <span aria-hidden="true">-&gt;</span></button>
+            <button id="start-button" class="button primary">훈련 시작 <span aria-hidden="true">→</span></button>
             <a class="button ghost" href="#guide">훈련 안내</a>
           </div>
           <p class="notice">실제 현장에서는 소속 기관의 최신 지침, 지휘 및 구체적 상황을 우선하십시오.</p>
@@ -63,7 +83,7 @@
         <article class="situation-panel">
           <div class="scene-tag"><span></span> 현장 상황</div>
           <p id="situation-text" class="situation-text"></p>
-          <div class="fact-grid" id="fact-grid"></div>
+          <div id="fact-grid" class="fact-grid"></div>
           <div class="priority-note"><strong>판단 원칙</strong><span id="principle-text"></span></div>
         </article>
         <section class="choice-panel" aria-labelledby="choice-title">
@@ -85,7 +105,7 @@
         <div><span>관찰 결과</span><p id="feedback-outcome"></p></div>
         <div><span>코칭 포인트</span><p id="feedback-coaching"></p></div>
       </div>
-      <button id="next-button" class="button primary">다음 상황으로 <span aria-hidden="true">-&gt;</span></button>
+      <button id="next-button" class="button primary">다음 상황으로 <span aria-hidden="true">→</span></button>
     </section>
 
     <section id="result-view" class="view results" aria-labelledby="result-title">
@@ -97,10 +117,10 @@
       <div class="result-grid">
         <section class="total-score" aria-label="종합 점수">
           <span>종합 평가</span>
-          <div class="score-ring" id="score-ring"><strong id="total-score">0</strong><small>/ 100</small></div>
+          <div id="score-ring" class="score-ring"><strong id="total-score">0</strong><small>/ 100</small></div>
           <b id="grade-label"></b>
         </section>
-        <section class="metric-card" id="metric-list"></section>
+        <section id="metric-list" class="metric-card"></section>
       </div>
       <div class="review-grid">
         <section class="review-card"><h2>선택 이력</h2><div id="history-list"></div></section>
@@ -115,8 +135,8 @@
         </div>
         <p class="legal-disclaimer">이 내용은 법률 자문이나 최신 현장 매뉴얼을 대체하지 않습니다. 실제 교육 전 국가법령정보센터와 경찰청 최신 지침을 확인하십시오.</p>
         <div class="source-links">
-          <a href="https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B2%BD%EC%B0%B0%EA%B4%80%EC%A7%81%EB%AC%B4%EC%A7%91%ED%96%89%EB%B2%95" target="_blank" rel="noreferrer">경찰관직무집행법 확인</a>
-          <a href="https://www.law.go.kr/" target="_blank" rel="noreferrer">국가법령정보센터</a>
+          <a href="https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B2%BD%EC%B0%B0%EA%B4%80%EC%A7%81%EB%AC%B4%EC%A7%91%ED%96%89%EB%B2%95" target="_blank" rel="noreferrer">경찰관직무집행법 확인 ↗</a>
+          <a href="https://www.law.go.kr/" target="_blank" rel="noreferrer">국가법령정보센터 ↗</a>
         </div>
       </section>
       <p id="save-status" class="save-status" aria-live="polite"></p>
