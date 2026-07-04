@@ -12,17 +12,17 @@
 2. SQL Editor에서 `supabase/schema.sql` 내용을 실행합니다.
 3. Project Settings > API에서 Project URL과 anon public key를 복사합니다.
 4. `supabase-config.js`의 `url`, `anonKey` 값을 실제 값으로 바꿉니다.
-5. Authentication > Providers에서 Email provider를 켭니다.
+
+훈련자가 결과 페이지에 도달하면 로그인 없이 `training_results` 테이블에 결과가 자동 저장됩니다.
 
 ## 구조
 
 - `index.html`: 화면과 교육 콘텐츠
 - `styles.css`: 반응형 공공안전 UI
-- `auth.css`: 인증 패널 UI
-- `app.js`: 진행, 점수, 결과 리포트, 인증, DB 저장 로직
+- `app.js`: 진행, 점수, 결과 리포트, 익명 DB 자동 저장 로직
 - `data/scenarios.js`: 교체 가능한 mock 시나리오 데이터
 - `supabase-config.js`: Supabase 클라이언트 설정
-- `supabase/schema.sql`: 인증 사용자별 훈련 결과 저장 테이블과 RLS 정책
+- `supabase/schema.sql`: 익명 훈련 결과 저장 테이블과 RLS 정책
 
 ## 유의사항
 
