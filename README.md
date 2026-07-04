@@ -1,18 +1,29 @@
-# 112 Response Simulator
+# 112 흉기위협 대응 시뮬레이터
 
-현장 경찰관을 위한 흉기 위협 대응 의사결정 훈련 시뮬레이터입니다.
+현장 경찰관의 안전 중심 의사결정을 위한 정적 교육 프로토타입입니다.
 
 ## 실행
 
-정적 웹사이트입니다. `index.html`을 브라우저에서 열거나 Vercel 같은 정적 호스팅에 배포하면 됩니다.
+`index.html`을 브라우저에서 열거나 정적 파일 서버로 현재 폴더를 실행합니다. 빌드 과정은 필요하지 않습니다.
 
-## 구성
+## Supabase 설정
 
-- `index.html`: 화면 구조와 교육 콘텐츠
-- `styles.css`: 반응형 UI 스타일
-- `app.js`: 진행, 점수, 결과 리포트 로직
-- `data/scenarios.js`: mock 훈련 시나리오 데이터
+1. Supabase 프로젝트를 생성합니다.
+2. SQL Editor에서 `supabase/schema.sql` 내용을 실행합니다.
+3. Project Settings > API에서 Project URL과 anon public key를 복사합니다.
+4. `supabase-config.js`의 `url`, `anonKey` 값을 실제 값으로 바꿉니다.
+5. Authentication > Providers에서 Email provider를 켭니다.
 
-## 주의사항
+## 구조
 
-이 서비스는 교육용 프로토타입이며 실제 지휘, 작전, 법적 판단을 대체하지 않습니다. 실제 교육 전 소속 기관의 최신 현장 지침과 관련 법령을 확인해야 합니다.
+- `index.html`: 화면과 교육 콘텐츠
+- `styles.css`: 반응형 공공안전 UI
+- `auth.css`: 인증 패널 UI
+- `app.js`: 진행, 점수, 결과 리포트, 인증, DB 저장 로직
+- `data/scenarios.js`: 교체 가능한 mock 시나리오 데이터
+- `supabase-config.js`: Supabase 클라이언트 설정
+- `supabase/schema.sql`: 인증 사용자별 훈련 결과 저장 테이블과 RLS 정책
+
+## 유의사항
+
+법률 및 정책 설명은 교육용 요약입니다. 실제 교육에 사용하기 전 소속 기관의 최신 현장 지침과 국가법령정보센터의 현행 법령을 검토해야 합니다.
