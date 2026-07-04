@@ -13,6 +13,9 @@ create table if not exists public.training_results (
 
 alter table public.training_results enable row level security;
 
+drop policy if exists "Users can read own training results" on public.training_results;
+drop policy if exists "Users can insert own training results" on public.training_results;
+
 create policy "Users can read own training results"
   on public.training_results
   for select
