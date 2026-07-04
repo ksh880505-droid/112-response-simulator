@@ -1,5 +1,6 @@
 create table if not exists public.training_results (
   id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
   session_id text not null,
   scenario_id text not null,
   scenario_title text not null,
@@ -13,6 +14,9 @@ create table if not exists public.training_results (
 );
 
 alter table public.training_results enable row level security;
+
+alter table public.training_results
+  add column if not exists user_id uuid references auth.users(id) on delete set null;
 
 drop policy if exists "Anyone can insert training results" on public.training_results;
 drop policy if exists "Authenticated users can read training results" on public.training_results;
@@ -29,4 +33,4 @@ create policy "Authenticated users can read training results"
   on public.training_results
   for select
   to authenticated
-  using (true);
+  using (user_id is null or auth.uid() = user_id);
