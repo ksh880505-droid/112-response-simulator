@@ -1,0 +1,10 @@
+# Local working files
+work/
+outputs/
+github-upload/
+112-response-simulator-upload.zip
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.log
