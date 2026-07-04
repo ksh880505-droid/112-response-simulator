@@ -1,6 +1,12 @@
 const scenario = window.TRAINING_SCENARIOS[0];
 const views = [...document.querySelectorAll(".view")];
-const state = { step: 0, scores: { safety: 0, tactical: 0, legal: 0 }, history: [], result: null, user: null };
+const state = {
+  step: 0,
+  scores: { safety: 0, tactical: 0, legal: 0 },
+  history: [],
+  result: null,
+  saved: false
+};
 const supabaseConfig = window.SUPABASE_CONFIG || {};
 const hasSupabaseConfig = Boolean(
   window.supabase &&
@@ -13,45 +19,20 @@ const supabaseClient = hasSupabaseConfig ? window.supabase.createClient(supabase
 
 const $ = (id) => document.getElementById(id);
 
-function setAuthMessage(message, tone = "muted") {
-  $("auth-message").textContent = message;
-  $("auth-message").dataset.tone = tone;
+function getSessionId() {
+  const key = "response_training_session_id";
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+  const created = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  localStorage.setItem(key, created);
+  return created;
 }
 
-function updateAuthUI() {
-  const signedIn = Boolean(state.user);
-  $("auth-status").innerHTML = signedIn ? "<span></span> 로그인됨" : "<span></span> 로그인 필요";
-  $("signout-button").classList.toggle("hidden", !signedIn);
-  $("auth-form").classList.toggle("hidden", signedIn);
-  if (signedIn) setAuthMessage(`${state.user.email} 계정으로 훈련 결과를 저장할 수 있습니다.`);
-  else if (!hasSupabaseConfig) setAuthMessage("Supabase URL과 anon key를 supabase-config.js에 넣으면 인증과 저장이 활성화됩니다.");
-  else setAuthMessage("이메일과 비밀번호로 로그인하거나 회원가입할 수 있습니다.");
-}
-
-async function loadSession() {
-  if (!supabaseClient) {
-    updateAuthUI();
-    return;
-  }
-
-  const { data } = await supabaseClient.auth.getSession();
-  state.user = data.session?.user || null;
-  updateAuthUI();
-
-  supabaseClient.auth.onAuthStateChange((_event, session) => {
-    state.user = session?.user || null;
-    updateAuthUI();
-  });
-}
-
-async function signIn(email, password) {
-  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-  if (error) throw error;
-}
-
-async function signUp(email, password) {
-  const { error } = await supabaseClient.auth.signUp({ email, password });
-  if (error) throw error;
+function setSaveStatus(message, tone = "muted") {
+  const target = $("save-status");
+  if (!target) return;
+  target.textContent = message;
+  target.dataset.tone = tone;
 }
 
 function showView(id) {
@@ -64,6 +45,8 @@ function resetState() {
   state.scores = { safety: 0, tactical: 0, legal: 0 };
   state.history = [];
   state.result = null;
+  state.saved = false;
+  setSaveStatus("");
 }
 
 function renderStep() {
@@ -80,7 +63,7 @@ function renderStep() {
   step.choices.forEach((choice, index) => {
     const button = document.createElement("button");
     button.className = "choice";
-    button.innerHTML = `<span class="choice-key">${String.fromCharCode(65 + index)}</span><span>${choice.label}</span><i aria-hidden="true">→</i>`;
+    button.innerHTML = `<span class="choice-key">${String.fromCharCode(65 + index)}</span><span>${choice.label}</span><i aria-hidden="true">-></i>`;
     button.addEventListener("click", () => chooseAction(choice));
     $("choices").appendChild(button);
   });
@@ -93,9 +76,9 @@ function chooseAction(choice) {
   const total = Object.values(choice.scores).reduce((sum, score) => sum + score, 0);
   const level = choice.tone === "danger" ? "risk" : total >= 65 ? "good" : "caution";
   const copy = {
-    good: ["안전 중심 판단", "판단의 우선순위가 적절합니다.", "✓"],
+    good: ["안전 중심 판단", "판단의 우선순위가 적절합니다.", "OK"],
     caution: ["재평가 필요", "일부 효과가 있지만 보완이 필요합니다.", "!"],
-    risk: ["위험 증가", "경찰관의 위험 노출이 커지는 선택입니다.", "×"]
+    risk: ["위험 증가", "경찰관의 위험 노출이 커지는 선택입니다.", "X"]
   }[level];
 
   $("feedback-view").dataset.level = level;
@@ -108,7 +91,7 @@ function chooseAction(choice) {
   $("feedback-scores").innerHTML = [
     ["안전", choice.scores.safety], ["전술", choice.scores.tactical], ["법적", choice.scores.legal]
   ].map(([label, score]) => `<span>${label} <b>+${score}</b></span>`).join("");
-  $("next-button").innerHTML = state.step === scenario.steps.length - 1 ? "결과 리포트 보기 <span>→</span>" : "다음 상황으로 <span>→</span>";
+  $("next-button").innerHTML = state.step === scenario.steps.length - 1 ? "결과 리포트 보기 <span>-></span>" : "다음 상황으로 <span>-></span>";
   showView("feedback-view");
 }
 
@@ -135,72 +118,36 @@ function buildResult() {
   if (!improvements.length) improvements.push("지원 도착 후 역할 분담과 현장 인계까지 판단 범위를 확장해 보십시오.");
   $("improvement-list").innerHTML = improvements.map((item) => `<li>${item}</li>`).join("");
   showView("result-view");
+  saveResult();
 }
 
 async function saveResult() {
   if (!supabaseClient) {
-    setAuthMessage("Supabase 설정을 먼저 입력해야 결과를 저장할 수 있습니다.", "warning");
+    setSaveStatus("Supabase 설정이 없어 저장을 건너뛰었습니다.", "warning");
     return;
   }
-  if (!state.user) {
-    setAuthMessage("로그인 후 결과를 저장할 수 있습니다.", "warning");
-    return;
-  }
-  if (!state.result) {
-    setAuthMessage("훈련을 완료한 뒤 결과를 저장할 수 있습니다.", "warning");
-    return;
-  }
+  if (!state.result || state.saved) return;
 
+  setSaveStatus("훈련 결과를 저장하는 중입니다...");
   const { error } = await supabaseClient.from("training_results").insert({
-    user_id: state.user.id,
+    session_id: getSessionId(),
     scenario_id: scenario.id,
     scenario_title: scenario.title,
     total_score: state.result.total,
     grade: state.result.grade,
     scores: state.result.scores,
     normalized_scores: state.result.normalized,
-    choice_history: state.result.history
+    choice_history: state.result.history,
+    user_agent: navigator.userAgent
   });
 
   if (error) {
-    setAuthMessage(`저장 실패: ${error.message}`, "warning");
+    setSaveStatus(`저장 실패: ${error.message}`, "warning");
     return;
   }
-  setAuthMessage("훈련 결과를 Supabase DB에 저장했습니다.");
+  state.saved = true;
+  setSaveStatus("훈련 결과가 DB에 자동 저장되었습니다.");
 }
-
-loadSession();
-
-$("auth-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  if (!supabaseClient) {
-    setAuthMessage("Supabase 설정을 먼저 입력하십시오.", "warning");
-    return;
-  }
-  try {
-    await signIn($("auth-email").value, $("auth-password").value);
-    setAuthMessage("로그인되었습니다.");
-  } catch (error) {
-    setAuthMessage(`로그인 실패: ${error.message}`, "warning");
-  }
-});
-
-$("signup-button").addEventListener("click", async () => {
-  if (!supabaseClient) {
-    setAuthMessage("Supabase 설정을 먼저 입력하십시오.", "warning");
-    return;
-  }
-  try {
-    await signUp($("auth-email").value, $("auth-password").value);
-    setAuthMessage("회원가입 요청이 완료되었습니다. 이메일 확인 설정이 켜져 있으면 메일을 확인하십시오.");
-  } catch (error) {
-    setAuthMessage(`회원가입 실패: ${error.message}`, "warning");
-  }
-});
-
-$("signout-button").addEventListener("click", async () => {
-  if (supabaseClient) await supabaseClient.auth.signOut();
-});
 
 $("start-button").addEventListener("click", () => { resetState(); renderStep(); showView("simulation-view"); });
 $("exit-button").addEventListener("click", () => showView("intro-view"));
@@ -210,4 +157,3 @@ $("next-button").addEventListener("click", () => {
 });
 $("retry-button").addEventListener("click", () => { resetState(); renderStep(); showView("simulation-view"); });
 $("print-button").addEventListener("click", () => window.print());
-$("save-result-button").addEventListener("click", saveResult);
