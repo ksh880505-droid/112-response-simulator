@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08131f">
+  <meta name="description" content="현장 경찰관을 위한 흉기 위협 대응 의사결정 훈련 시뮬레이터">
+  <title>112 RESPONSE | 흉기위협 대응 시뮬레이터</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 이동</a>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="112 Response 홈">
+      <span class="brand-mark">112</span>
+      <span><strong>RESPONSE</strong><small>현장 대응 훈련</small></span>
+    </a>
+    <div class="status-pill"><span></span> 교육용 프로토타입</div>
+  </header>
+
+  <main id="main">
+    <section id="intro-view" class="view active" aria-labelledby="hero-title">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">SCENARIO-BASED TRAINING 01</p>
+          <h1 id="hero-title">당신은 지금 흉기를 든<br>대상자와 마주하고 있습니다.</h1>
+          <p class="hero-lead">제한된 정보와 시간 안에서 다음 행동을 선택하십시오. 이 훈련은 정답 암기가 아니라 <strong>거리, 엄폐, 지원</strong>을 우선하는 판단 과정을 점검합니다.</p>
+          <div class="hero-actions">
+            <button id="start-button" class="button primary">훈련 시작 <span aria-hidden="true">→</span></button>
+            <a class="button ghost" href="#guide">훈련 안내</a>
+          </div>
+          <p class="notice">실제 현장에서는 소속 기관의 최신 지침, 지휘 및 구체적 상황을 우선하십시오.</p>
+        </div>
+        <aside class="dispatch-card" aria-label="초기 신고 정보">
+          <div class="dispatch-head"><span>112 신고 접수</span><time>14:32:08</time></div>
+          <div class="signal"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <dl>
+            <div><dt>신고 유형</dt><dd>흉기 소지 · 이상행동</dd></div>
+            <div><dt>현장</dt><dd>상가 밀집 골목</dd></div>
+            <div><dt>가용 정보</dt><dd>제한적</dd></div>
+          </dl>
+          <div class="dispatch-alert"><span>!</span> 대상자가 순찰차 방향으로 이동 중</div>
+        </aside>
+      </div>
+
+      <div id="guide" class="guide-grid">
+        <article><span class="number">01</span><div><h2>교육 목적</h2><p>위협에 반응하기 전 안전 공간을 만들고 위험을 재평가하는 습관을 훈련합니다.</p></div></article>
+        <article><span class="number">02</span><div><h2>진행 방법</h2><p>3개 상황에서 행동을 선택하면 즉시 결과가 반영되고 최종 리포트가 생성됩니다.</p></div></article>
+        <article><span class="number">03</span><div><h2>평가 기준</h2><p>경찰관 안전성, 전술적 적절성, 법적 적절성을 각각 100점 기준으로 평가합니다.</p></div></article>
+      </div>
+    </section>
+
+    <section id="simulation-view" class="view simulator" aria-labelledby="scenario-title">
+      <div class="sim-header">
+        <div><p class="eyebrow">ACTIVE SCENARIO</p><h1 id="scenario-title">정신질환 의심 흉기 소지자</h1></div>
+        <button id="exit-button" class="text-button">훈련 종료</button>
+      </div>
+      <div class="progress-wrap" aria-label="훈련 진행 상태">
+        <div class="progress-meta"><span id="step-label">STEP 1 / 3</span><span id="progress-percent">33%</span></div>
+        <div class="progress-track"><div id="progress-bar"></div></div>
+      </div>
+      <div class="sim-grid">
+        <article class="situation-panel">
+          <div class="scene-tag"><span></span> 현장 상황</div>
+          <p id="situation-text" class="situation-text"></p>
+          <div class="fact-grid" id="fact-grid"></div>
+          <div class="priority-note"><strong>판단 원칙</strong><span id="principle-text"></span></div>
+        </article>
+        <section class="choice-panel" aria-labelledby="choice-title">
+          <p class="eyebrow">SELECT YOUR ACTION</p>
+          <h2 id="choice-title">다음 행동을 선택하십시오.</h2>
+          <div id="choices" class="choices"></div>
+          <p class="choice-help">선택 후에는 이전 단계로 돌아갈 수 없습니다.</p>
+        </section>
+      </div>
+    </section>
+
+    <section id="feedback-view" class="view feedback" aria-live="polite" aria-labelledby="feedback-title">
+      <div id="feedback-icon" class="feedback-icon"></div>
+      <p id="feedback-kicker" class="eyebrow"></p>
+      <h1 id="feedback-title"></h1>
+      <p id="feedback-summary" class="feedback-summary"></p>
+      <div id="feedback-scores" class="score-delta"></div>
+      <div class="feedback-detail">
+        <div><span>관찰 결과</span><p id="feedback-outcome"></p></div>
+        <div><span>코칭 포인트</span><p id="feedback-coaching"></p></div>
+      </div>
+      <button id="next-button" class="button primary">다음 상황으로 <span aria-hidden="true">→</span></button>
+    </section>
+
+    <section id="result-view" class="view results" aria-labelledby="result-title">
+      <div class="result-heading">
+        <p class="eyebrow">AFTER ACTION REVIEW</p>
+        <h1 id="result-title">훈련 결과 리포트</h1>
+        <p id="result-message"></p>
+      </div>
+      <div class="result-grid">
+        <section class="total-score" aria-label="종합 점수">
+          <span>종합 평가</span>
+          <div class="score-ring" id="score-ring"><strong id="total-score">0</strong><small>/ 100</small></div>
+          <b id="grade-label"></b>
+        </section>
+        <section class="metric-card" id="metric-list"></section>
+      </div>
+      <div class="review-grid">
+        <section class="review-card"><h2>선택 이력</h2><div id="history-list"></div></section>
+        <section class="review-card"><h2>개선 포인트</h2><ul id="improvement-list"></ul></section>
+      </div>
+      <section class="legal-card">
+        <div class="legal-head"><div><p class="eyebrow">LEGAL & POLICY NOTE</p><h2>법적·정책적 판단 참고</h2></div><span>교육용 요약</span></div>
+        <div class="legal-grid">
+          <article><h3>경찰관직무집행법</h3><p>경찰장비와 무기의 사용은 생명·신체 보호, 공무집행 저항 억제 등 법이 정한 목적과 요건 아래 필요한 한도에서 판단되어야 합니다.</p></article>
+          <article><h3>물리력 판단 원칙</h3><p>대상자의 행위와 위해 수준, 거리, 주변인 위험, 대체 수단을 계속 재평가하고 상황에 상응하는 수단을 선택해야 합니다.</p></article>
+          <article><h3>판례에서 보는 핵심</h3><p>구체적 사건의 긴급성, 위협의 현실성, 다른 수단의 가능성, 사용 방법과 결과를 종합해 상당성을 판단한다는 법리를 학습 포인트로 삼습니다.</p></article>
+        </div>
+        <p class="legal-disclaimer">이 내용은 법률 자문이나 최신 현장 매뉴얼을 대체하지 않습니다. 실제 교육 전 국가법령정보센터와 경찰청 최신 지침을 확인하십시오.</p>
+        <div class="source-links">
+          <a href="https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B2%BD%EC%B0%B0%EA%B4%80%EC%A7%81%EB%AC%B4%EC%A7%91%ED%96%89%EB%B2%95" target="_blank" rel="noreferrer">경찰관직무집행법 확인 ↗</a>
+          <a href="https://www.law.go.kr/" target="_blank" rel="noreferrer">국가법령정보센터 ↗</a>
+        </div>
+      </section>
+      <div class="result-actions">
+        <button id="retry-button" class="button primary">다시 훈련하기</button>
+        <button id="print-button" class="button ghost">결과 인쇄</button>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>112 RESPONSE TRAINING</span><p>본 서비스는 교육용 프로토타입이며 실제 지휘·작전 판단을 대체하지 않습니다.</p></footer>
+  <script src="data/scenarios.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
