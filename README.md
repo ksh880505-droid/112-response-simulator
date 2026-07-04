@@ -13,16 +13,16 @@
 3. Project Settings > API에서 Project URL과 anon public key를 복사합니다.
 4. `supabase-config.js`의 `url`, `anonKey` 값을 실제 값으로 바꿉니다.
 
-훈련자가 결과 페이지에 도달하면 로그인 없이 `training_results` 테이블에 결과가 자동 저장됩니다.
+훈련자가 결과 페이지에 도달하면 `training_results` 테이블에 결과가 자동 저장됩니다. 로그인한 사용자는 `user_id`와 함께 저장되고, 비회원은 익명 세션 기록으로 저장됩니다.
 
 ## 구조
 
 - `index.html`: 화면과 교육 콘텐츠
 - `styles.css`: 반응형 공공안전 UI
-- `app.js`: 진행, 점수, 결과 리포트, 익명 DB 자동 저장 로직
+- `app.js`: 진행, 점수, 결과 리포트, Supabase 인증, DB 자동 저장 로직
 - `data/scenarios.js`: 교체 가능한 mock 시나리오 데이터
 - `supabase-config.js`: Supabase 클라이언트 설정
-- `supabase/schema.sql`: 익명 훈련 결과 저장 테이블과 RLS 정책
+- `supabase/schema.sql`: 회원/비회원 훈련 결과 저장 테이블과 RLS 정책
 
 ## 유의사항
 
