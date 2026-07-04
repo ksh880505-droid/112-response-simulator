@@ -7,6 +7,7 @@
   <meta name="description" content="현장 경찰관을 위한 흉기 위협 대응 의사결정 훈련 시뮬레이터">
   <title>112 RESPONSE | 흉기위협 대응 시뮬레이터</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="auth.css">
 </head>
 <body>
   <a class="skip-link" href="#main">본문으로 이동</a>
@@ -15,10 +16,29 @@
       <span class="brand-mark">112</span>
       <span><strong>RESPONSE</strong><small>현장 대응 훈련</small></span>
     </a>
-    <div class="status-pill"><span></span> 교육용 프로토타입</div>
+    <div class="topbar-actions">
+      <div id="auth-status" class="status-pill"><span></span> 로그인 필요</div>
+      <button id="signout-button" class="text-button hidden">로그아웃</button>
+    </div>
   </header>
 
   <main id="main">
+    <section id="auth-panel" class="auth-panel" aria-labelledby="auth-title">
+      <div>
+        <p class="eyebrow">SUPABASE AUTH</p>
+        <h2 id="auth-title">훈련 기록을 저장하려면 로그인하십시오.</h2>
+      </div>
+      <form id="auth-form" class="auth-form">
+        <input id="auth-email" type="email" autocomplete="email" placeholder="email@example.com" required>
+        <input id="auth-password" type="password" autocomplete="current-password" placeholder="비밀번호" minlength="6" required>
+        <div class="auth-actions">
+          <button id="signin-button" class="button primary" type="submit">로그인</button>
+          <button id="signup-button" class="button ghost" type="button">회원가입</button>
+        </div>
+      </form>
+      <p id="auth-message" class="auth-message"></p>
+    </section>
+
     <section id="intro-view" class="view active" aria-labelledby="hero-title">
       <div class="hero-grid">
         <div class="hero-copy">
@@ -120,6 +140,7 @@
         </div>
       </section>
       <div class="result-actions">
+        <button id="save-result-button" class="button primary">결과 저장</button>
         <button id="retry-button" class="button primary">다시 훈련하기</button>
         <button id="print-button" class="button ghost">결과 인쇄</button>
       </div>
@@ -127,6 +148,8 @@
   </main>
 
   <footer><span>112 RESPONSE TRAINING</span><p>본 서비스는 교육용 프로토타입이며 실제 지휘·작전 판단을 대체하지 않습니다.</p></footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="data/scenarios.js"></script>
   <script src="app.js"></script>
 </body>
