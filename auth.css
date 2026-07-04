@@ -1,0 +1,17 @@
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.hidden { display: none !important; }
+.auth-panel { max-width: var(--max); margin: 0 auto; padding: 22px 24px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1.35fr auto; gap: 18px; align-items: center; }
+.auth-panel h2 { margin: 0; font-size: 17px; }
+.auth-form { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(140px, 1fr) auto; gap: 10px; align-items: center; }
+.auth-form input { min-height: 44px; width: 100%; border: 1px solid var(--line); border-radius: 7px; background: #0c1b29; color: var(--white); padding: 0 12px; outline: none; }
+.auth-form input:focus { border-color: var(--blue); }
+.auth-actions { display: flex; gap: 8px; }
+.auth-actions .button { min-height: 44px; padding: 0 15px; gap: 8px; }
+.auth-message { margin: 0; color: var(--muted); font-size: 12px; }
+.auth-message[data-tone="warning"] { color: var(--amber); }
+
+@media (max-width: 800px) {
+  .auth-panel { padding: 18px; grid-template-columns: 1fr; }
+  .auth-form { grid-template-columns: 1fr; }
+  .auth-actions { display: grid; grid-template-columns: 1fr 1fr; }
+}
